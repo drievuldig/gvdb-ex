@@ -1,0 +1,44 @@
+// errors due to incompatibility of CUDA w G++-11 under Ubuntu 22.04
+// solution, install G++-10 and tell CMake to use it:
+
+sudo apt install g++10
+// cmake in /home/devuser/gvdb-voxels/source/gvdb_library (to build directory)
+
+cmake -DCMAKE_CUDA_HOST_COMPILER=/usr/bin/g++-10 -Bbuild
+
+// ignore warnings about Policy CMP0104 is not set: CMAKE_CUDA_ARCHITECTURES now detected for NVCC,
+// empty CUDA_ARCHITECTURES not allowed
+// make with:
+
+make gvdb
+
+// move libgvdb.so to gvdb-voxels/lib and all *.h to gvdb-voxels/include directory 
+// compile application:
+
+nvcc helloworldgvdb.cu -I/home/devuser/gvdb-voxels/include -L/home/devuser/gvdb-voxels/lib
+
+// (alternative, use export?? CPLUS_INCLUDE_PATH=/home/devuser/gvdb-voxels/include:$CPLUS_INCLUDE_PATH)
+
+// before running executable make sure that dynamic library path is set:
+
+export LD_LIBRARY_PATH=/home/devuser/gvdb-voxels/lib:$LD_LIBRARY_PATH
+
+// how to get PTX files to be picked up during execution?
+// it works if they are located in the execution directory, is there an env variable to set the PATH?
+// needed?? export PATH=/home/devuser/gvdb-voxels/bin:$PATH
+
+// install GLEW and GLUT:
+sudo apt-get install -y libglew-dev
+sudo apt-get install -y freeglut3-dev
+
+OpenGL Context Init errors:
+---------------------------
+libGL error: No matching fbConfigs or visuals found
+libGL error: failed to load driver: swrast
+freeglut (GLEW Test): Unable to create OpenGL 1.0 context (flags 0, profile 0)
+X Error of failed request:  BadValue (integer parameter out of range for operation)
+  Major opcode of failed request:  149 (GLX)
+  Minor opcode of failed request:  24 (X_GLXCreateNewContext)
+  Value in failed request:  0x0
+  Serial number of failed request:  38
+  Current serial number in output stream:  39
